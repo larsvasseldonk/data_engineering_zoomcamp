@@ -169,3 +169,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+ny_taxi_postgres_data
+01-docker-terraform/ny_taxi_postgres_data
+
+01-docker-terraform/keys/google_creds.json
+
+*.csv
