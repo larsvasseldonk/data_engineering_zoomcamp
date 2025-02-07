@@ -149,6 +149,57 @@ LEFT AT VIDEO 1.3.2: Terraform basics
 
 DEADLINE FOR HOMEWORK 2: THURSDAY 6 OF FEBRUARY 00:00
 
+### 1.4.1. Setting up the Environment on Google Cloud
+
+To connect with Google Cloud VM:
+- Go to Google Cloud and turn [VM instance](https://console.cloud.google.com/compute/instances?onCreate=true&hl=nl&inv=1&invt=Abo8UQ&project=sandbox-450016) on
+- Open iTerm and enter the command: `ssh -i ~/.ssh/gcp lars@34.34.153.74`
+    - You are connected with your VM. To check the properties of the VM, use: `htop`
+    - The VM already has the Google Cloud SDK (check with: `gcloud --version`)
+- The VM is empty. We have to configure it:
+    - Download Anaconda: `wget https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh`
+    - Install it with: `bash Anaconda3-2024.10-1-Linux-x86_64.sh`
+    - Next, install Docker with: `sudo apt-get install docker.io`
+        - To run Docker without `sudo`:
+            - `sudo groupadd docker`
+            - `sudo gpasswd -a $USER docker`
+            - `sudo service docker restart`
+            - Logout of the VM
+    - Get the course repo: `git clone https://github.com/DataTalksClub/data-engineering-zoomcamp.git`
+    - Install docker-compose:
+        - Make new directory for executions files: `mkdir bin`
+        - Move to new directory: `cd bin`
+        - Get latest docker-compose (checkout the repo): `wget wget https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-linux-x86_64`
+        - Make the file executable with: `chmod +x docker-compose`
+        - Make it visible from any directory by adding it to the path variable:
+            - Open bash startup file: `nano .bashrc`
+            - Go to the end and add: `export PATH="${HOME}/bin:${PATH}"`
+            - Press Ctrl+O to save it, Enter, and Ctrl-X to exit the screen
+    - Install PGcli with `pip install pgcli`
+    - Install Terraform in the `bin` directory: `wget https://releases.hashicorp.com/terraform/1.10.5/terraform_1.10.5_linux_386.zip`
+
+
+Setting a config to connect with the VM:
+- Go to the `~/.ssh` folder
+- Make a SSH config file with the command: `touch config`
+- Open the config file: `code config` and put the following content:
+
+```bash
+Host de-zoomcamp
+    HostName 34.34.153.74
+    User lars
+    IdentityFile ~/.ssh/gcp
+```
+
+Now, when you type: `ssh de-zoomcamp` it uses the identifyfile specified above to connect with your VM.
+
+Usefull commands in Ubuntu VM:
+- `less .bashrc` - To watch the startup file the VM runs when it starts up
+- `logout` - To logout of your VM (ctrl-D)
+- `sudo apt-get update` - To fetch the latest packages
+- `mkdir bin` - To create a folder with all the executable files
+- `-O` - Flag to specify the output name
+- `chmod +x docker-compose` - To give the docker-compose execution permissions (green means its executable)
 
 ## WEEK 2 - Workflow Orchestration
 
@@ -169,3 +220,5 @@ What we cover:
 - Scheduling and backfills
 
 dbt = data build tool
+
+
