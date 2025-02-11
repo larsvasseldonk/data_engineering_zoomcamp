@@ -169,7 +169,7 @@ To connect with Google Cloud VM:
     - Install docker-compose:
         - Make new directory for executions files: `mkdir bin`
         - Move to new directory: `cd bin`
-        - Get latest docker-compose (checkout the repo): `wget wget https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-linux-x86_64`
+        - Get latest docker-compose (checkout the repo): `wget https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-linux-x86_64`
         - Make the file executable with: `chmod +x docker-compose`
         - Make it visible from any directory by adding it to the path variable:
             - Open bash startup file: `nano .bashrc`
@@ -178,7 +178,6 @@ To connect with Google Cloud VM:
     - Install PGcli with `pip install pgcli`
     - Install Terraform in the `bin` directory: `wget https://releases.hashicorp.com/terraform/1.10.5/terraform_1.10.5_linux_386.zip`
 
-
 Setting a config to connect with the VM:
 - Go to the `~/.ssh` folder
 - Make a SSH config file with the command: `touch config`
@@ -186,12 +185,33 @@ Setting a config to connect with the VM:
 
 ```bash
 Host de-zoomcamp
-    HostName 34.34.153.74
+    HostName 130.211.53.124
     User lars
     IdentityFile ~/.ssh/gcp
 ```
 
+To transfer the `gcs.json` credential file to the VM:
+- On your local computer, navigate to the folder in which the `gcs.json` file is located
+- Type `sftp de-zoomcamp` to setup a FTP connection
+- Type `put gcs.json` to transfer the crendentials file
+
+Setup Google Application credentials in VM:
+- Create a new environment variable: `export GOOGLE_APPLICATION_CREDENTIALS=~/.gc/gcs.json`
+- Authenticate with GCloud with: `gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS`
+
+Please note: each time you restart your VM, the external IP address changes and has to be updated:
+- Go to the `~/.ssh` folder
+- Open config with: `code config`
+- Change the `HostName` to the new external IP address
+- Save file
+
+To close the VM down, you can do it in the terminal with: `sudo shutdown now`
+
 Now, when you type: `ssh de-zoomcamp` it uses the identifyfile specified above to connect with your VM.
+
+To connect VS code with your VM:
+- Press Ctrl-Command-P and type `>Remove-SSH: Connect to host`
+- Select `de-zoomcamp`
 
 Usefull commands in Ubuntu VM:
 - `less .bashrc` - To watch the startup file the VM runs when it starts up
@@ -221,4 +241,69 @@ What we cover:
 
 dbt = data build tool
 
+## WEEK 3 - Data Warehouse
 
+OLTP = OnLine Transaction Processing
+OLAP = OnLine Analytical Processing
+
+Data warehouse is a OLAP solution. 
+
+BigQuery (BQ):
+- Serverless data warehouse
+    - There are no servers to manage or database software to install
+- Software as well as infrastructure including
+    - Scalability and high-availability
+- Many build-in features like:
+    - ML
+    - Geospatial analysis
+    - Business intelligence
+- Includes public datasets
+
+Partions in BQ:
+- On columns:
+    - Time-unit column
+    - Ingestion time
+    - Integer range partitioning
+- To make not a full scan over the table when quering it
+- Only possible on 1 column
+- Number of partitions limit is 4000
+
+Clustering in BQ:
+- Columns you specify are used to colocate related data
+- Order of column is important
+- Clustering improves:
+    - Filter queries
+    - Aggregate queries
+- Table with data size less then 1GB don't show improvement with partitioning of clustering
+- You can specify up to four clustering columns
+- Clustering columns must be top-level, non repeated columns
+
+Clustering over paritioning: use clustering when...
+- Partitioning results in small partitions (less then 1GB)
+- Partitioning results in more then 4000 different partitions
+- Partitioning results in your mutation operations modifying the majority of partitions in the table frequently (e.g. every few minutes all partitions have to be updated)
+
+BQ best practices:
+For cost reduction:
+- Avoid `SELECT *` (specify the columns instead)
+- Price your queries before running them
+- Use clustered or partitioned tables
+- Use streaming inserts with caution (they can increase your cost)
+- Materialize query results in stages
+For query performance:
+- Filter on partioned columns
+- Denormalizing data
+- Use nested or repeated columns
+- Use external data sources appropiately
+    - Don't use it, in case you want a high query performance
+- Reduce data before using `JOIN`
+- Do not treat `WITH` clauses as prepared statements
+- Avoid oversharing tables
+- Avoid JavaScript user-defined functions
+- Use approximate aggregation functions
+- Order statement should be at the end of the query
+- Optimize your join patterns
+- Place the largest table first, followed by the table with the fewest rows, and then place the remaining tables by decreasing size
+    - Reason: the first table gets distributed evently, the second table would be broadcasted to all the nodes
+
+BQ uses column-oriented storage. The reason BigQuery is so fast is because it divides the query into smaller chunks that can be distrited on different (leaf) nodes.
