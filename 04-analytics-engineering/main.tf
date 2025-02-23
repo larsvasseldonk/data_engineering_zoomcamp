@@ -29,7 +29,7 @@ resource "google_storage_bucket" "mod04-bucket" {
   }
 }
 
-# resource "google_bigquery_dataset" "mod04-bq-dataset" {
-#   dataset_id                  = var.bq_dataset_name
-#   location                    = var.location
-# }
+resource "google_bigquery_dataset" "mod04-bq-dataset" {
+  dataset_id                  = var.bq_dataset_name
+  location                    = var.location
+}
