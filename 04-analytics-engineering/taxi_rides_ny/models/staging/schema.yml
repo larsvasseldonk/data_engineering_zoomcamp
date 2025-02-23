@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  name: staging
+  database: sandbox-450016
+  schema: mod04_bq_dataset
+
+  tables:
+    - name: green_tripdata
+    - name: yellow_tripdata
