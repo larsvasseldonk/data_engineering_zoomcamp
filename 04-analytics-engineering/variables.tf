@@ -20,7 +20,7 @@ variable "location" {
 
 variable "bq_dataset_name" {
   description = "BigQuery Dataset Name"
-  default = "mod04_bq-dataset"
+  default = "mod04_bq_dataset"
 }
 
 variable "gcs_bucket_name" {
